@@ -16,7 +16,7 @@ const siteMetadata = {
   locale: 'ko-KR',
   analytics: {
     googleAnalytics: {
-      googleAnalyticsId: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID,
+      googleAnalyticsId: `${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`,
     },
   },
   newsletter: {
