@@ -57,7 +57,7 @@ const ThemeSwitch = () => {
     <div className="mr-5 flex items-center">
       <Menu as="div" className="relative inline-block text-left">
         <div className="flex items-center justify-center hover:text-primary-500 dark:hover:text-primary-400">
-          <Menu.Button>
+          <Menu.Button aria-label="Theme Switch">
             {mounted ? resolvedTheme === 'dark' ? <Moon /> : <Sun /> : <Blank />}
           </Menu.Button>
         </div>
@@ -77,6 +77,7 @@ const ThemeSwitch = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <button
+                        aria-label="Light Theme"
                         className={`${
                           active ? 'bg-primary-600 text-white' : ''
                         } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -93,6 +94,7 @@ const ThemeSwitch = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <button
+                        aria-label="Dark Theme"
                         className={`${
                           active ? 'bg-primary-600 text-white' : ''
                         } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -109,6 +111,7 @@ const ThemeSwitch = () => {
                   <Menu.Item>
                     {({ active }) => (
                       <button
+                        aria-label="System Theme"
                         className={`${
                           active ? 'bg-primary-600 text-white' : ''
                         } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
