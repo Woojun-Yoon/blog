@@ -60,6 +60,9 @@ module.exports = {
             'code::after': {
               content: 'none',
             },
+            img: {
+              borderRadius: '0.25rem',
+            },
           },
         },
         invert: {
