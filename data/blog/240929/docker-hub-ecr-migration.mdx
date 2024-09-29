@@ -1,0 +1,193 @@
+---
+title: 'Docker Hub에서 AWS ECR로 옮기기'
+date: '2024-09-29'
+tags: ['infra', 'devops', 'aws', 'ecr', 'github-actions']
+draft: false
+summary: '제목은 docker hub에서 ECR로 옮기기로 하겠습니다. 근데 이제 보안과 비용 절감을 곁들인'
+---
+
+## 소개
+
+현재 사용중인 컨테이너 이미지 리포지토리 서비스로 docker hub 유료 플랜을 사용하고 있었습니다.  
+잘 사용하고 있던 도중 한가지 비보를 팀원에게 전해듣게 되었는데요.  
+바로 24년 11월 부터 Docker Hub의 유료 플랜 가격이 최대 80% 정도 높아진다는 소식이였습니다.  
+[관련기사는 여기서 보실 수 있습니다.](https://zdnet.co.kr/view/?no=20240915011826)
+
+물론 docker hub 도 훌륭한 서비스가 맞지만, 운영중인 서비스가 AWS 기반으로 이뤄져 있다는 점과 아래와 같은 다양한 이유로 인해서 AWS ECR로 마이그레이션을 진행하게 되었습니다!
+
+1. EC2와 같은 리전의 ECR은 트래픽 비용이 없음 (대신 저장중인 이미지 용량에 따른 가격 책정)
+2. 통합적인 비용 관리 가능
+3. 같은 리전으로 인한 안정적인 속도 보장
+4. 쉽게 적용할 수 있는 IAM을 통한 OIDC 로그인 기능 (보안 향상)
+
+1번 이유의 경우 각각의 케이스에 따라 요금이 절감이 안될 수도 있습니다.  
+꼭 aws calculator와 같은 툴을 통해 비용 절감이 확실한지 비교해보시면 좋을 것 같습니다.
+
+현재 CI / CD 기능을 github actions를 통해서 구축해놓아서 이를 기반으로 마이그레이션을 진행합니다.
+
+## ECR Setting
+
+먼저 ECR에 사용할 리포지토리를 생성합니다.  
+ECR의 리포지토리 URL은 3개로 나누어지는데요. 각각 레지스트리, 네임스페이스, 리포지토리 이름으로 이루어져있습니다.  
+`<aws_account_id>.dkr.ecr.<region>.amazonaws.com/<name-space>/<repo-name>`
+
+리포지토리를 생성했다면 다음으로 github actions에서 해당 리포지토리로 이미지를 빌드하고 push 할 수 있도록 구현합니다.  
+물론, access, secret key를 사용해서 리포지토리에 push 할 수 있지만, 보안상 마음에 안드는 부분이 많아서, OIDC 인증 절차를 통해 리포지토리에 push 할 수 있도록 구현해보았습니다.
+
+## ECR OIDC Setting
+
+먼저 AWS IAM에서 자격 증명 공급자 탭에서 공급자를 추가합니다.
+
+`ProviderURL` : `https://token.actions.githubusercontent.com`  
+`Audience` : `sts.amazonaws.com`
+
+![240929-230447](/static/images/blog/docker-hub-ecr-migration/240929-230447.png)
+
+그 후, ECR push를 위한 IAM 역할에 부여할 정책을 정의합니다.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecr:CompleteLayerUpload",
+        "ecr:GetAuthorizationToken",
+        "ecr:UploadLayerPart",
+        "ecr:InitiateLayerUpload",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:PutImage"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+위 정책은 ECR의 모든 리포지토리에 push만 할 수 있는 권한입니다.  
+입맛에 맞게 바꿔 쓰시면 될 것 같습니다.
+이제 이렇게 만든 정책을 통해 역할을 만들어 보겠습니다.
+
+IAM 역할 생성 탭에서 `웹 자격 증명` 그리고, 아까 생성한 `OIDC(자격 증명 공급자)`와 `Audience`를 선택합니다.  
+![240929-231422](/static/images/blog/docker-hub-ecr-migration/240929-231422.png)
+
+조직 또는 계정 이름과 해당 역할을 사용할 github repository를 적어줬습니다.  
+참고로 옵셔널 필드는 비워두면 저절로 '\*' 전체 와일드카드가 붙습니다.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<aws-id>:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:<org-name>/<repository-name>:*"
+        }
+      }
+    }
+  ]
+}
+```
+
+자동으로 기입한 정보를 바탕으로 신뢰 관계를 잘 생성해 주는것을 확인할 수 있습니다.  
+이렇게 신뢰 관계를 정의하면 이제 github actions 에서 쉽게 OIDC를 통해 key 값 없이 ECR에 push를 할 수 있습니다.
+
+## github actions ECR push
+
+이전에 생성한 역할의 arn을 통해서, push 테스트를 진행해보았습니다.
+
+```yaml
+- name: Configure AWS credentials for ECR role assumption
+  if: ${{ always() }}
+  uses: aws-actions/configure-aws-credentials@v4
+  with:
+    role-to-assume: ${{ secrets.ECR_ROLE_ARN }} (OIDC ROLE ARN)
+    aws-region: ap-northeast-2 (리전)
+
+- name: Login to Amazon ECR
+  if: ${{ always() }}
+  id: login-ecr
+  uses: aws-actions/amazon-ecr-login@v2
+
+- name: Build, tag, and push docker image to Amazon ECR
+  if: ${{ always() }}
+  run: |
+    docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest .
+    docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO }}:latest
+```
+
+![240929-232347](/static/images/blog/docker-hub-ecr-migration/240929-232347.png)  
+정상적으로 이미지가 push 된 것을 확인할 수 있습니다.
+
+여기까지 github actions 에서 안전하게 ECR에 이미지를 push 할 수 있도록 구현했습니다.  
+이제 현재 사용중인 EC2에서 안전하게 ECR의 이미지를 pull 할 수 있도록 구현해보겠습니다.
+
+## EC2에서 ECR 이미지 pull
+
+ECR에 안전하게 접근하기 위해서, 사용중인 EC2에 ECR 접근 역할을 부여해보겠습니다.  
+먼저, 앞서 역할을 다음과 같이 생성합니다.
+
+![240929-233330](/static/images/blog/docker-hub-ecr-migration/240929-233330.png)
+
+그 후, `AmazonEC2ContainerRegistryReadOnly` 라는 권한을 해당 역할에 부여해 역할을 생성합니다.  
+해당 권한은 EC2에서 ECR의 이미지를 pull 할 수 있도록 해주는 최소한의 권한입니다.
+
+만든 역할을 적용하려는 EC2 인스턴스의 작업 -> 보안 -> IAM 역할 수정 탭에서 적용시켜줍니다.
+
+여기까지 적용하시면, EC2에서 `docker login`명령어를 통해서 pull을 수행할 수 있습니다.  
+한줄로 pull 하는 명령어는 다음과 같습니다.  
+`docker login -u AWS -p $(aws ecr get-login-password --region <region>) <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+`
+
+물론 이렇게 하는 방법보다 더 간편하고 좋은 방법이 있습니다.  
+[amazon-ecr-credential-helper](https://github.com/awslabs/amazon-ecr-credential-helper)룰 사용하는 방법입니다.
+
+사용중인 EC2 인스턴스에서 아래와 같이 세팅을 해줍니다.
+
+```sh
+# Set Docker-ECR-Credential-Helper
+# Use AL2023
+sudo dnf install -y amazon-ecr-credential-helper
+# Set docker config.json for ECR Credential Helper
+sudo sh -c 'cat <<EOF > /home/<Users home>/.docker/config.json
+{
+  "credsStore": "ecr-login"
+}
+```
+
+세팅 방법은 위 amazon-ecr-credential-helper의 readme에 친절히 작성되어있습니다.  
+AL2023을 사용중이지 않으시면, 확인해보시길 바랍니다.
+
+위 방식으로 인증방식을 적용하면, 먼저 `docker login`, `docker logout` 등의 명령어를 일일이 쓸 필요가 없어집니다.
+
+```log
+err: WARNING! Your password will be stored unencrypted in /home/ec2-user/.docker/config.json.
+err: Configure a credential helper to remove this warning. See
+err: https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+```
+
+그리고, 위와 같이 짜증났던 경고 문구도 더이상 안볼 수 있습니다!  
+이제 pull 을 받을 수 있으니, github actions 에 ssh 접속을 통한 pull 명령어만 실행하면 쉽게 이미지 pull 이 가능합니다!
+
+## 추가적인 비용절감
+
+여기까지만 해도 같은 리전의 리포지토리를 사용하여, 트래픽 비용이 절감되지만, 극한의 비용절감을 위해 이미지의 수명 주기를 설정해줍니다.  
+리포지토리의 사용하지 않는 이미지가 쌓이면서 생기는 용량 비용을 줄이기 위해섭니다.  
+사용중인 리포지토리의 작업 -> 수명 주기 정책 탭에서 규칙을 생성합니다.  
+규칙은 잘 정리된 [관련 블로그 글](https://velog.io/@480/%EA%B0%84%EB%8B%A8%ED%95%98%EA%B2%8C-AWS-ECR-%EB%B9%84%EC%9A%A9-%EC%A4%84%EC%9D%B4%EA%B8%B0)을 참고해서 정의했습니다.
+
+## 마무리
+
+이번 마이그레이션을 통해서, 비용절감과 불안하던 보안 등 많은 개선이 이루어졌습니다.  
+계산기 때려보고 수지타산이 맞는지 검토 후 적용하시면 좋으실 것 같습니다.
+
+읽어주셔서 감사합니다. 궁금하신점은 댓글로 최대한 아는선에서 답변해드리겠습니다.
