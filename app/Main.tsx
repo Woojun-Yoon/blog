@@ -49,7 +49,7 @@ export default function Home({ posts }) {
                           </div>
                         </div>
                         <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                          {summary}
+                          <Link href={`/blog/${slug}`}>{summary}</Link>
                         </div>
                       </div>
                       <div className="text-base font-medium leading-6">
