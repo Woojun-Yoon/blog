@@ -14,6 +14,8 @@ const siteMetadata = {
   github: 'https://github.com/Woojun-Yoon',
   instagram: 'https://www.instagram.com/woojun123',
   locale: 'ko-KR',
+  // set to true if you want a navbar fixed to the top
+  stickyNav: false,
   analytics: {
     googleAnalytics: {
       googleAnalyticsId: `${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`,
