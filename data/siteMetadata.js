@@ -1,6 +1,6 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Tech Blog',
+  title: 'Junlog',
   author: 'Yoon Woo Jun',
   headerTitle: 'Everything like scratch',
   description: '안녕하세요! 개발자 윤우준입니다.',
