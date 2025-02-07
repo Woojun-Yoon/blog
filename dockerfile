@@ -1,6 +1,8 @@
 # Base image
 FROM node:22-alpine AS base
 ENV NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production YARN_VERSION=4.5.3
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
 
 RUN apk update && apk upgrade && apk add --no-cache libc6-compat && apk add dumb-init
 
@@ -11,7 +13,6 @@ RUN adduser --system --uid 1001 nextjs
 
 # Build image
 FROM base AS builder
-ENV DATABASE_URL=${DATABASE_URL}
 
 WORKDIR /app
 
