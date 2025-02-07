@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 const HomeClient = () => {
-  const [totalViews, setTotalViews] = useState<number>(0)
+  const [totalViews, setTotalViews] = useState<string>('...')
 
   useEffect(() => {
     fetch('/api/visit')
