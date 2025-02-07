@@ -33,4 +33,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["yarn", "run", "start:production"]
+CMD ["dumb-init", "node", "server.js"]

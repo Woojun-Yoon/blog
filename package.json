@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "start": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && node .next/standalone/server.js",
-    "start:production": "yarn prisma migrate deploy && dumb-init node server.js",
     "dev": "cross-env INIT_CWD=$PWD next dev",
     "build": "cross-env INIT_CWD=$PWD next build && cross-env NODE_OPTIONS='--experimental-json-modules' node ./scripts/postbuild.mjs",
     "analyze": "cross-env ANALYZE=true next build",
