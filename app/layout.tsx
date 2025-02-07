@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const basePath = process.env.BASE_PATH || ''
 
   return (
-    <html lang={siteMetadata.language} className={Pretendard.className} suppressHydrationWarning>
+    <html lang={siteMetadata.language} suppressHydrationWarning={true}>
       <link
         rel="apple-touch-icon"
         sizes="76x76"
@@ -85,7 +85,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+      <body
+        className={`${Pretendard.className} bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white`}
+      >
         <TrackingProvider>
           <ThemeProviders>
             <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />

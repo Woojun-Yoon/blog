@@ -23,9 +23,6 @@ const config: Config = {
         13: '3.25rem',
         14: '3.5rem',
       },
-      fontFamily: {
-        sans: ['var(--font-space-grotesk)', ...defaultTheme.fontFamily.sans],
-      },
       colors: {
         primary: colors.pink,
         gray: colors.gray,
