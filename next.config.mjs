@@ -84,7 +84,9 @@ const config = () => {
         test: /\.svg$/,
         use: ['@svgr/webpack'],
       })
-
+      config.infrastructureLogging = {
+        level: 'error',
+      }
       return config
     },
   })

@@ -16,7 +16,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
+    "strictNullChecks": true,
     "paths": {
+      "@/*": ["./src/*"],
       "@/components/*": ["components/*"],
       "@/data/*": ["data/*"],
       "@/layouts/*": ["layouts/*"],
@@ -27,8 +29,7 @@
       {
         "name": "next"
       }
-    ],
-    "strictNullChecks": true
+    ]
   },
   "include": [
     "next-env.d.ts",
