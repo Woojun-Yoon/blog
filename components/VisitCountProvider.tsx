@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from 'react'
 
-const HomeClient = () => {
-  const [totalViews, setTotalViews] = useState<string>('...')
+const VisitCountProvider = () => {
+  const [totalVisitCount, setTotalVisitCount] = useState<string>('...')
 
   useEffect(() => {
     fetch('/api/visit')
       .then((res) => res.json())
       .then((data) => {
-        setTotalViews(data.totalViews)
+        setTotalVisitCount(data.totalViews)
       })
       .catch((err) => console.error('Fetch error:', err))
   }, [])
@@ -37,10 +37,10 @@ const HomeClient = () => {
         <div className="text-base font-semibold text-gray-900 dark:text-gray-100">전체 방문자</div>
       </div>
       <p className="text-base font-extrabold text-gray-900 dark:text-gray-100">
-        {totalViews.toLocaleString()}
+        {totalVisitCount.toLocaleString()}
       </p>
     </div>
   )
 }
 
-export default HomeClient
+export default VisitCountProvider

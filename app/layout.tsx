@@ -11,7 +11,7 @@ import Footer from '@/components/Footer'
 import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
-import TrackingProvider from '@/components/TrackingProvider'
+import VisitTrackingProvider from '@/components/VisitTrackingProvider'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteMetadata.siteUrl),
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${Pretendard.className} bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white`}
       >
-        <TrackingProvider>
+        <VisitTrackingProvider>
           <ThemeProviders>
             <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
             <SectionContainer>
@@ -101,7 +101,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
             </SectionContainer>
           </ThemeProviders>
-        </TrackingProvider>
+        </VisitTrackingProvider>
       </body>
     </html>
   )

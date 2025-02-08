@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
-const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
+const VisitTrackingProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname()
 
   useEffect(() => {
@@ -20,4 +20,4 @@ const TrackingProvider = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>
 }
 
-export default TrackingProvider
+export default VisitTrackingProvider

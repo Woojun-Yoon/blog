@@ -1,6 +1,6 @@
 import Link from '@/components/Link'
 import Tag from '@/components/Tag'
-import ViewCountProvider from '@/components/ViewCountProvider'
+import VisitCountProvider from '@/components/VisitCountProvider'
 import siteMetadata from '@/data/siteMetadata'
 import { formatDate } from 'pliny/utils/formatDate'
 
@@ -15,7 +15,7 @@ export default function Home({ posts }) {
             <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
               Latest
             </h1>
-            <ViewCountProvider />
+            <VisitCountProvider />
           </div>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
             {siteMetadata.description}
