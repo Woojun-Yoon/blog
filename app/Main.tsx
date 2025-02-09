@@ -40,6 +40,7 @@ export default function Home({ posts }) {
                         <div>
                           <h2 className="text-2xl font-bold leading-8 tracking-tight">
                             <Link
+                              prefetch={false}
                               href={`/blog/${slug}`}
                               className="text-gray-900 dark:text-gray-100"
                             >
@@ -53,11 +54,14 @@ export default function Home({ posts }) {
                           </div>
                         </div>
                         <div className="prose max-w-none text-gray-500 dark:text-gray-400">
-                          <Link href={`/blog/${slug}`}>{summary}</Link>
+                          <Link prefetch={false} href={`/blog/${slug}`}>
+                            {summary}
+                          </Link>
                         </div>
                       </div>
                       <div className="text-base font-medium leading-6">
                         <Link
+                          prefetch={false}
                           href={`/blog/${slug}`}
                           className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
                           aria-label={`Read more: "${title}"`}
