@@ -3,7 +3,7 @@
 import { Comments as CommentsComponent } from 'pliny/comments'
 import siteMetadata from '@/data/siteMetadata'
 
-export default function Comments({ slug }: { slug: string }) {
+const Comments = ({ slug }: { slug: string }) => {
   if (!siteMetadata.comments?.provider) {
     return null
   }
@@ -13,3 +13,5 @@ export default function Comments({ slug }: { slug: string }) {
     </>
   )
 }
+
+export default Comments

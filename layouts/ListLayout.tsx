@@ -20,7 +20,7 @@ interface ListLayoutProps {
   pagination?: PaginationProps
 }
 
-function Pagination({ totalPages, currentPage }: PaginationProps) {
+const Pagination = ({ totalPages, currentPage }: PaginationProps) => {
   const pathname = usePathname()
   const segments = pathname.split('/')
   const lastSegment = segments[segments.length - 1]
@@ -64,12 +64,7 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   )
 }
 
-export default function ListLayout({
-  posts,
-  title,
-  initialDisplayPosts = [],
-  pagination,
-}: ListLayoutProps) {
+const ListLayout = ({ posts, title, initialDisplayPosts = [], pagination }: ListLayoutProps) => {
   const [searchValue, setSearchValue] = useState('')
   const filteredBlogPosts = posts.filter((post) => {
     const searchContent = post.title + post.summary + post.tags?.join(' ')
@@ -154,3 +149,5 @@ export default function ListLayout({
     </>
   )
 }
+
+export default ListLayout

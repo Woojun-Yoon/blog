@@ -4,14 +4,14 @@ import siteMetadata from '@/data/siteMetadata'
 import ListLayout from '@/layouts/ListLayoutWithTags'
 import { allBlogs } from 'contentlayer/generated'
 import tagData from 'app/tag-data.json'
-import { genPageMetadata } from 'app/seo'
+import genPageMetadata from 'app/seo'
 import { Metadata } from 'next'
 
 const POSTS_PER_PAGE = 5
 
-export async function generateMetadata(props: {
+export const generateMetadata = async (props: {
   params: Promise<{ tag: string }>
-}): Promise<Metadata> {
+}): Promise<Metadata> => {
   const params = await props.params
   const tag = decodeURI(params.tag)
   return genPageMetadata({
@@ -34,7 +34,7 @@ export const generateStaticParams = async () => {
   }))
 }
 
-export default async function TagPage(props: { params: Promise<{ tag: string }> }) {
+const TagPage = async (props: { params: Promise<{ tag: string }> }) => {
   const params = await props.params
   const tag = decodeURI(params.tag)
   // Capitalize first letter and convert space to dash
@@ -44,3 +44,5 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
   )
   return <ListLayout posts={filteredPosts} title={title} />
 }
+
+export default TagPage

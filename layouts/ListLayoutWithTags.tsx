@@ -21,7 +21,7 @@ interface ListLayoutProps {
   pagination?: PaginationProps
 }
 
-function Pagination({ totalPages, currentPage }: PaginationProps) {
+const Pagination = ({ totalPages, currentPage }: PaginationProps) => {
   const pathname = usePathname()
   const segments = pathname.split('/')
   const lastSegment = segments[segments.length - 1]
@@ -67,12 +67,12 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   )
 }
 
-export default function ListLayoutWithTags({
+const ListLayoutWithTags = ({
   posts,
   title,
   initialDisplayPosts = [],
   pagination,
-}: ListLayoutProps) {
+}: ListLayoutProps) => {
   const pathname = usePathname()
   const tagCounts = tagData as Record<string, number>
   const tagKeys = Object.keys(tagCounts)
@@ -174,3 +174,5 @@ export default function ListLayoutWithTags({
     </>
   )
 }
+
+export default ListLayoutWithTags

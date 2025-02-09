@@ -9,7 +9,7 @@ interface PageSEOProps {
   [key: string]: any
 }
 
-export function genPageMetadata({ title, description, image, ...rest }: PageSEOProps): Metadata {
+const genPageMetadata = ({ title, description, image, ...rest }: PageSEOProps): Metadata => {
   return {
     title,
     description: description || siteMetadata.description,
@@ -30,3 +30,5 @@ export function genPageMetadata({ title, description, image, ...rest }: PageSEOP
     ...rest,
   }
 }
+
+export default genPageMetadata

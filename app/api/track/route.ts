@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 
 const prisma = new PrismaClient()
 
-async function getIpAddress(): Promise<string | null> {
+const getIpAddress = async (): Promise<string | null> => {
   const forwardedFor = (await headers()).get('x-forwarded-for')
   if (!forwardedFor) {
     return 'unknown'
@@ -12,12 +12,12 @@ async function getIpAddress(): Promise<string | null> {
   return forwardedFor.split(',')[0].trim()
 }
 
-function getTodayDate(): Date {
+const getTodayDate = (): Date => {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth(), now.getDate())
 }
 
-export async function POST() {
+export const POST = async () => {
   try {
     const ip = await getIpAddress()
     if (!ip) {

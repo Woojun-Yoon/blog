@@ -25,7 +25,7 @@ interface LayoutProps {
   children: ReactNode
 }
 
-export default function PostLayout({ content, authorDetails, next, prev, children }: LayoutProps) {
+const PostLayout = ({ content, authorDetails, next, prev, children }: LayoutProps) => {
   const { filePath, path, slug, date, title, tags } = content
   const basePath = path.split('/')[0]
 
@@ -155,3 +155,5 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
     </SectionContainer>
   )
 }
+
+export default PostLayout

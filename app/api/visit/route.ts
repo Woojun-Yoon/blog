@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-export async function GET(_request: NextRequest) {
+export const GET = async () => {
   try {
-    // blogVisit에서 id=1 행을 가져온다고 가정 (단 하나의 row로 관리)
+    // Manage the total visitCount by one row in the database
     const blogVisit = await prisma.blogVisit.findUnique({
       where: { id: 1 },
     })

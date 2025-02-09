@@ -16,7 +16,7 @@ interface LayoutProps {
   prev?: { path: string; title: string }
 }
 
-export default function PostLayout({ content, next, prev, children }: LayoutProps) {
+const PostLayout = ({ content, next, prev, children }: LayoutProps) => {
   const { path, slug, date, title } = content
 
   return (
@@ -80,3 +80,5 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
     </SectionContainer>
   )
 }
+
+export default PostLayout
