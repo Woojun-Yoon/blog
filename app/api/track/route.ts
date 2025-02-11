@@ -5,9 +5,16 @@ import { headers } from 'next/headers'
 const prisma = new PrismaClient()
 
 const getIpAddress = async (): Promise<string | null> => {
-  const forwardedFor = (await headers()).get('x-forwarded-for')
+  const allHeaders = await headers()
+
+  const ipFromCF = allHeaders.get('cf-connecting-ip')
+  if (ipFromCF) {
+    return ipFromCF
+  }
+
+  const forwardedFor = allHeaders.get('x-forwarded-for')
   if (!forwardedFor) {
-    return 'unknown'
+    return null
   }
   return forwardedFor.split(',')[0].trim()
 }
