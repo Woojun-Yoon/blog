@@ -40,6 +40,13 @@
   content: attr(line);
 }
 
+:not(pre) > code {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+  max-width: 100%;
+}
+
 /* Token styles */
 /**
  * MIT License
